@@ -7,26 +7,40 @@ const User = db.User;
 module.exports = {
     authenticate,
     getAll,
+    getAllLogs,
     getById,
     create,
     update,
     delete: _delete
 };
 
-async function authenticate({ username, password }) {
+
+
+async function authenticate({ username, password, login_logs }) {
     const user = await User.findOne({ username });
     if (user && bcrypt.compareSync(password, user.hash)) {
         const { hash, ...userWithoutHash } = user.toObject();
         const token = jwt.sign({ sub: user.id }, config.secret);
+        let userParam = { username, login_logs: [...user.login_logs, login_logs] };
+        // copy userParam properties to user
+        Object.assign(user, userParam);
+        await user.save();
+        
         return {
             ...userWithoutHash,
             token
         };
+
     }
 }
 
 async function getAll() {
     return await User.find().select('-hash');
+}
+
+
+async function getAllLogs() {
+    return await User.find().select('login_logs');
 }
 
 async function getById(id) {

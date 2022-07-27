@@ -6,6 +6,8 @@ const userService = require('./user.service');
 router.post('/authenticate', authenticate);
 router.post('/register', register);
 router.get('/', getAll);
+router.get('/logs', getAllLogs);
+
 router.get('/current', getCurrent);
 router.get('/:id', getById);
 router.put('/:id', update);
@@ -14,7 +16,8 @@ router.delete('/:id', _delete);
 module.exports = router;
 
 function authenticate(req, res, next) {
-    userService.authenticate(req.body)
+    let login_logs = { client_ip: req.ip, login_timestamp: new Date(), logout_timestamp: new Date() };
+    userService.authenticate({ ...req.body, login_logs })
         .then(user => user ? res.json(user) : res.status(400).json({ message: 'Username or password is incorrect' }))
         .catch(err => next(err));
 }
@@ -27,6 +30,13 @@ function register(req, res, next) {
 
 function getAll(req, res, next) {
     userService.getAll()
+        .then(users => res.json(users))
+        .catch(err => next(err));
+}
+
+
+function getAllLogs(req, res, next) {
+    userService.getAllLogs()
         .then(users => res.json(users))
         .catch(err => next(err));
 }

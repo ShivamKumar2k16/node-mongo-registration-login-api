@@ -1,3 +1,4 @@
+const { json } = require('body-parser');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -6,7 +7,10 @@ const schema = new Schema({
     hash: { type: String, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    createdDate: { type: Date, default: Date.now }
+    createdDate: { type: Date, default: Date.now },
+    login_logs:[
+        { type: Object }
+    ]
 });
 
 schema.set('toJSON', { virtuals: true });
